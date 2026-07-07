@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Background -->
+  <rect width="64" height="64" rx="14" fill="#0b0b18"/>
+
+  <!-- Image frame -->
+  <rect x="10" y="13" width="44" height="34" rx="5" fill="#1a1a2e" stroke="#10b981" stroke-width="2.5"/>
+
+  <!-- Landscape hills inside frame -->
+  <path d="M10 37 L22 22 L31 31 L39 24 L54 37" stroke="#10b981" stroke-width="2" stroke-linejoin="round" fill="none" opacity="0.5"/>
+
+  <!-- Sun dot -->
+  <circle cx="44" cy="21" r="3" fill="#10b981" opacity="0.7"/>
+
+  <!-- Left inward arrow -->
+  <line x1="13" y1="53" x2="21" y2="53" stroke="#10b981" stroke-width="2.5" stroke-linecap="round"/>
+  <polyline points="18,50 21,53 18,56" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+
+  <!-- Right inward arrow -->
+  <line x1="51" y1="53" x2="43" y2="53" stroke="#10b981" stroke-width="2.5" stroke-linecap="round"/>
+  <polyline points="46,50 43,53 46,56" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+
+  <!-- Center dot -->
+  <circle cx="32" cy="53" r="2" fill="#10b981" opacity="0.6"/>
+</svg>
