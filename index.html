@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Compressor de Imagens</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Overlay ao arrastar -->
+  <div id="drag-overlay" class="drag-overlay hidden">
+    <div class="drag-overlay-content">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0 3 3m-3-3-3 3M6.75 19.5a4.5 4.5 0 0 1-1.41-8.775 5.25 5.25 0 0 1 10.233-2.33 3 3 0 0 1 3.758 3.848A3.752 3.752 0 0 1 18 19.5H6.75Z" /></svg>
+      <p>Solte as imagens aqui</p>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <!-- Header -->
+    <header>
+      <h1>Compressor de Imagens</h1>
+      <p>Compressao em lote no navegador — seus arquivos nunca saem do dispositivo</p>
+    </header>
+
+    <!-- Dropzone -->
+    <div id="dropzone" class="dropzone">
+      <input type="file" id="file-input" multiple accept="image/jpeg,image/png,image/webp,image/gif" />
+      <div class="dropzone-inner">
+        <div class="dropzone-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0 3 3m-3-3-3 3M6.75 19.5a4.5 4.5 0 0 1-1.41-8.775 5.25 5.25 0 0 1 10.233-2.33 3 3 0 0 1 3.758 3.848A3.752 3.752 0 0 1 18 19.5H6.75Z" /></svg>
+        </div>
+        <p class="dropzone-label">Arraste imagens ou <span class="link">clique para selecionar</span></p>
+        <p class="dropzone-sub">JPG &middot; PNG &middot; WEBP &middot; GIF &mdash; sem limite de arquivos</p>
+      </div>
+    </div>
+
+    <!-- Aviso de ignorados -->
+    <div id="skipped-notice" class="notice notice-amber hidden"></div>
+
+    <!-- Modo de compressao -->
+    <section>
+      <p class="section-label">Modo de Compressao</p>
+      <div class="modes-grid">
+        <button class="mode-btn active" data-mode="better-quality">
+          <div class="mode-top">
+            <svg class="mode-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" /></svg>
+            <span class="mode-badge">85%</span>
+          </div>
+          <span class="mode-name">Melhor Qualidade</span>
+          <span class="mode-desc">Qualidade alta, bom balanco de tamanho</span>
+        </button>
+        <button class="mode-btn" data-mode="smaller-size">
+          <div class="mode-top">
+            <svg class="mode-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 9V4.5M9 9H4.5M9 9 3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5 5.25 5.25" /></svg>
+            <span class="mode-badge">60%</span>
+          </div>
+          <span class="mode-name">Menor Tamanho</span>
+          <span class="mode-desc">Arquivo minimo, boa para web e email</span>
+        </button>
+        <button class="mode-btn" data-mode="specific-size">
+          <div class="mode-top">
+            <svg class="mode-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path stroke-linecap="round" d="M12 3v2M12 19v2M3 12h2M19 12h2"/></svg>
+            <span class="mode-badge">auto</span>
+          </div>
+          <span class="mode-name">Tamanho Especifico</span>
+          <span class="mode-desc">Voce define o tamanho alvo</span>
+        </button>
+      </div>
+
+      <div id="specific-size-panel" class="specific-panel hidden">
+        <label>Tamanho alvo por arquivo:</label>
+        <input type="number" id="target-size" value="500" min="1" step="1" placeholder="500" />
+        <div class="unit-toggle">
+          <button class="unit-btn active" data-unit="KB">KB</button>
+          <button class="unit-btn" data-unit="MB">MB</button>
+        </div>
+        <span id="target-desc" class="target-desc">Cada imagem sera comprimida ate 500 KB</span>
+      </div>
+    </section>
+
+    <!-- Barra de acoes -->
+    <div class="actions">
+      <button id="btn-compress" class="btn btn-primary" disabled>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M4.5 5.653c0-1.427 1.529-2.33 2.779-1.643l11.54 6.347c1.295.712 1.295 2.573 0 3.286L7.28 19.99c-1.25.687-2.779-.217-2.779-1.643V5.653Z" clip-rule="evenodd" /></svg>
+        Comprimir Imagens
+      </button>
+      <button id="btn-download" class="btn btn-outline hidden">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3.75H6.912a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H15M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859M12 3v8.25m0 0-3-3m3 3 3-3" /></svg>
+        <span id="btn-download-label">Baixar Todas</span>
+      </button>
+      <button id="btn-recompress" class="btn btn-ghost hidden">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>
+        Re-comprimir
+      </button>
+      <button id="btn-clear" class="btn btn-danger hidden">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg>
+        Limpar tudo
+      </button>
+    </div>
+
+    <!-- Aviso lote grande -->
+    <div id="large-batch-notice" class="notice notice-amber hidden"></div>
+
+    <!-- Progresso -->
+    <div id="progress-section" class="progress-section hidden">
+      <div class="progress-header">
+        <span id="progress-label">0 de 0 concluidas</span>
+        <span id="progress-pct" class="progress-pct">0%</span>
+      </div>
+      <div class="progress-bar-track">
+        <div id="progress-bar" class="progress-bar-fill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <!-- Resumo de resultados -->
+    <div id="results-summary" class="results-summary hidden">
+      <div class="result-card result-green">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+        <div>
+          <p class="result-label">Concluidas</p>
+          <p id="result-done" class="result-value">0</p>
+        </div>
+      </div>
+      <div class="result-card">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" /></svg>
+        <div>
+          <p class="result-label">Economia</p>
+          <p id="result-saved" class="result-value">0 KB</p>
+        </div>
+      </div>
+      <div class="result-card">
+        <div class="result-pct-icon">%</div>
+        <div>
+          <p class="result-label">Reducao media</p>
+          <p id="result-pct" class="result-value">0%</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lista de imagens -->
+    <div id="file-bar" class="file-bar hidden">
+      <span id="file-count">0 arquivos</span>
+      <button id="btn-add-more" class="btn-add-more">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+        Adicionar mais
+      </button>
+      <input type="file" id="add-more-input" multiple accept="image/jpeg,image/png,image/webp,image/gif" />
+    </div>
+
+    <div id="image-list" class="image-list"></div>
+
+  </div>
+
+  <!-- CDN libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
